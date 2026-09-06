@@ -677,5 +677,3 @@ The current implementation enforces the organization boundary during reconciliat
 I would first strengthen the tenant boundary at the API layer by introducing an explicit tenant context and organization-level query filtering.
 
 I would also add more edge-case tests for malformed references, missing locations, invalid numeric values, and additional cross-organization scenarios.
-
-````
