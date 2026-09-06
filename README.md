@@ -60,39 +60,58 @@ Records are matched using:
 
 ```text
 Organization + Normalized Record Reference
+````
 
 This prevents records from different organizations from being incorrectly matched.
 
-❌ Missing in System B
+---
+
+## ❌ Missing in System B
 
 Detects a System A record that has no corresponding System B entry within the same organization.
 
 Reason:
 
+```text
 missing_in_system_b
-⚠️ Orphan System B Entry
+```
+
+---
+
+## ⚠️ Orphan System B Entry
 
 Detects a System B entry whose organization and normalized record reference do not correspond to a System A record.
 
 Reason:
 
+```text
 orphan_system_b
-🔁 Duplicate System B Entry
+```
+
+---
+
+## 🔁 Duplicate System B Entry
 
 Detects when multiple System B entries refer to the same record within an organization.
 
 Reason:
 
+```text
 duplicate_in_system_b
+```
 
 Duplicate source rows are preserved instead of being deleted.
 
-💰 Value Mismatch
+---
+
+## 💰 Value Mismatch
 
 The application compares:
 
+```text
 System A → total_value
 System B → value
+```
 
 Numeric values are parsed before comparison so that formatting differences such as commas do not create false mismatches.
 
@@ -100,38 +119,51 @@ Blank values are also handled safely.
 
 Reason:
 
+```text
 value_mismatch
-📊 Reconciliation Result
+```
+
+---
+
+# 📊 Reconciliation Result
 
 For the supplied dataset, the tenant-safe comparison produces:
 
-Disagreement Type	Count
-Value mismatches	5
-Missing in System B	3
-Duplicate System B references	2
-Orphan System B entries	2
-Total disagreements	12
+| Disagreement Type             |  Count |
+| ----------------------------- | -----: |
+| Value mismatches              |      5 |
+| Missing in System B           |      3 |
+| Duplicate System B references |      2 |
+| Orphan System B entries       |      2 |
+| **Total disagreements**       | **12** |
 
 The additional missing/orphan result is caused by a record reference appearing under different organizations.
 
 For example:
 
+```text
 System A:
 ORG-A + REC-1077
+```
 
 and:
 
+```text
 System B:
 ORG-B + REC-1077
+```
 
 are treated as different reconciliation records because organization is part of the matching key.
 
-👥 Organization / Tenant Boundary
+---
+
+# 👥 Organization / Tenant Boundary
 
 Every location belongs to exactly one organization.
 
 The database relationship is:
 
+```text
 Organization
      │
      └── Location
@@ -139,10 +171,13 @@ Organization
             ├── System A Record
             │
             └── System B Entry
+```
 
 The reconciliation logic uses:
 
+```text
 Organization + Normalized Record Reference
+```
 
 as the comparison boundary.
 
@@ -150,111 +185,169 @@ Therefore, the same record reference cannot be incorrectly matched across organi
 
 Authentication was intentionally not implemented because authentication is outside the requested scope of the assignment.
 
-🖥️ Dashboard
+---
+
+# 🖥️ Dashboard
 
 The React dashboard displays every disagreement in a simple table.
 
 The table contains:
 
-Reason
-Record ID
-Field
-System A value
-System B value
-Location
-Organization
+* Reason
+* Record ID
+* Field
+* System A value
+* System B value
+* Location
+* Organization
 
 The UI intentionally remains simple because the assignment prioritizes a working reconciliation feature over visual design.
 
-🎯 Filtering
+---
+
+# 🎯 Filtering
 
 The dashboard allows disagreements to be filtered by reason.
 
 Available filters:
 
-All
-Value mismatch
-Missing in System B
-Duplicate in System B
-Orphan System B
+* All
+* Value mismatch
+* Missing in System B
+* Duplicate in System B
+* Orphan System B
 
 The backend also supports filtering through the API.
 
 Example:
 
+```text
 /api/disagreements/?reason=value_mismatch
-↕️ Sorting
+```
+
+---
+
+# ↕️ Sorting
 
 The dashboard supports sorting disagreements by value.
 
 Ascending:
 
+```text
 /api/disagreements/?sort=value
+```
 
 Descending:
 
+```text
 /api/disagreements/?sort=-value
-🔌 API
+```
+
+---
+
+# 🔌 API
 
 The backend provides a REST API for the reconciliation results.
 
-Get all disagreements
+## Get all disagreements
+
+```text
 GET /api/disagreements/
-Filter by reason
+```
+
+## Filter by reason
+
+```text
 GET /api/disagreements/?reason=value_mismatch
+```
+
+```text
 GET /api/disagreements/?reason=missing_in_system_b
+```
+
+```text
 GET /api/disagreements/?reason=duplicate_in_system_b
+```
+
+```text
 GET /api/disagreements/?reason=orphan_system_b
-Sort by value
+```
+
+## Sort by value
+
+```text
 GET /api/disagreements/?sort=value
+```
+
+```text
 GET /api/disagreements/?sort=-value
-🧪 Testing
+```
+
+---
+
+# 🧪 Testing
 
 Tests focus on the reconciliation logic where disagreements are decided.
 
 The current test suite contains:
 
+```text
 12 tests
 12 passed
+```
 
 Tests cover:
 
-Missing System B records
-Orphan System B entries
-Duplicate System B entries
-Value mismatches
-Matching records
-Dirty record references
-Comma-formatted numeric values
-Blank values
-API response
-API filtering
-Empty filter results
-Cross-tenant record isolation
+* Missing System B records
+* Orphan System B entries
+* Duplicate System B entries
+* Value mismatches
+* Matching records
+* Dirty record references
+* Comma-formatted numeric values
+* Blank values
+* API response
+* API filtering
+* Empty filter results
+* Cross-tenant record isolation
 
 Run the tests:
 
+```bash
 cd backend
 python manage.py test reconciliation
+```
 
 Expected:
 
+```text
 Ran 12 tests
 
 OK
-🛠️ Tech Stack
-Layer	Technology
-Backend	Django
-API	Django REST Framework
-Frontend	React
-Build Tool	Vite
-Database	SQLite
-Language	Python
-Styling	CSS
-Testing	Django Test Framework
-Version Control	Git
-Repository	GitHub
-📁 Project Structure
+```
+
+---
+
+# 🛠️ Tech Stack
+
+| Layer           | Technology            |
+| --------------- | --------------------- |
+| Backend         | Django                |
+| API             | Django REST Framework |
+| Frontend        | React                 |
+| Build Tool      | Vite                  |
+| Database        | SQLite                |
+| Language        | Python                |
+| Styling         | CSS                   |
+| Testing         | Django Test Framework |
+| Version Control | Git                   |
+| Repository      | GitHub                |
+
+---
+
+# 📁 Project Structure
+
+```text
 adosx-reconciliation/
 │
 ├── backend/
@@ -305,182 +398,284 @@ adosx-reconciliation/
 ├── README.md
 ├── DECISIONS.md
 └── .gitignore
-⚙️ How to Run
-🔹 1. Clone the Repository
+```
+
+---
+
+# ⚙️ How to Run
+
+## 🔹 1. Clone the Repository
+
+```bash
 git clone <YOUR_PRIVATE_REPOSITORY_URL>
 
 cd adosx-reconciliation
-🐍 Backend
-🔹 2. Create Virtual Environment
+```
+
+---
+
+# 🐍 Backend
+
+## 🔹 2. Create Virtual Environment
+
+```bash
 cd backend
 
 python -m venv venv
-Windows
+```
+
+### Windows
+
+```powershell
 .\venv\Scripts\Activate.ps1
-🔹 3. Install Dependencies
+```
+
+---
+
+## 🔹 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-🔹 4. Create Database
+```
+
+---
+
+## 🔹 4. Create Database
+
+```bash
 python manage.py migrate
-🔹 5. Import CSV Data
+```
+
+---
+
+## 🔹 5. Import CSV Data
+
+```bash
 python manage.py import_csv
+```
 
 This imports:
 
+```text
 ../data/locations.csv
 ../data/system_a.csv
 ../data/system_b.csv
-🔹 6. Run Tests
+```
+
+---
+
+## 🔹 6. Run Tests
+
+```bash
 python manage.py test reconciliation
+```
 
 Expected:
 
+```text
 Ran 12 tests
 
 OK
-🔹 7. Start Django
+```
+
+---
+
+## 🔹 7. Start Django
+
+```bash
 python manage.py runserver
+```
 
 Backend:
 
+```text
 http://127.0.0.1:8000/
-⚛️ Frontend
+```
+
+---
+
+# ⚛️ Frontend
 
 Open a new terminal.
 
-🔹 1. Navigate to Frontend
+## 🔹 1. Navigate to Frontend
+
+```bash
 cd frontend
-🔹 2. Install Dependencies
+```
+
+## 🔹 2. Install Dependencies
+
+```bash
 npm install
-🔹 3. Start React
+```
+
+## 🔹 3. Start React
+
+```bash
 npm run dev
+```
 
 Frontend:
 
+```text
 http://localhost:5173/
-📱 Application Flow
-Import locations and organization mappings
-Import System A records
-Import System B entries
-Normalize System B record references
-Match records within the organization boundary
-Detect missing records
-Detect orphan entries
-Detect duplicate entries
-Compare values
-Return disagreements through the API
-Display disagreements in the React dashboard
-Filter by reason
-Sort by value
-🤖 How I Worked With the Agent
+```
+
+---
+
+# 📱 Application Flow
+
+1. Import locations and organization mappings
+2. Import System A records
+3. Import System B entries
+4. Normalize System B record references
+5. Match records within the organization boundary
+6. Detect missing records
+7. Detect orphan entries
+8. Detect duplicate entries
+9. Compare values
+10. Return disagreements through the API
+11. Display disagreements in the React dashboard
+12. Filter by reason
+13. Sort by value
+
+---
+
+# 🤖 How I Worked With the Agent
 
 I used limited AI assistance during the assignment as a development aid.
 
 I used the agent mainly for:
 
-Understanding Django and React implementation details
-Reviewing implementation approaches
-Debugging development errors
-Identifying edge cases
-Improving test coverage
-Reviewing parts of the documentation
+* Understanding Django and React implementation details
+* Reviewing implementation approaches
+* Debugging development errors
+* Identifying edge cases
+* Improving test coverage
+* Reviewing parts of the documentation
 
 I did not treat AI-generated code as automatically correct. I ran the application, inspected the supplied dataset, compared the reconciliation results, and ran the automated tests before accepting changes.
 
 The most important example was the tenant-boundary issue described below.
 
-❌ What I Deliberately Did Not Build
+---
+
+# ❌ What I Deliberately Did Not Build
 
 The assignment explicitly excludes several areas from evaluation, so I intentionally kept them out of scope.
 
 I did not build:
 
-Authentication
-Login functionality
-Role-based authorization
-Production deployment
-Advanced performance optimization
-Server-side pagination
-Background job processing
-Real-time updates
-Complex UI design
+* Authentication
+* Login functionality
+* Role-based authorization
+* Production deployment
+* Advanced performance optimization
+* Server-side pagination
+* Background job processing
+* Real-time updates
+* Complex UI design
 
 The goal was to deliver a small, complete, and well-tested reconciliation feature rather than a larger partially implemented system.
 
-🚧 Challenges Faced
+---
+
+# 🚧 Challenges Faced
 
 The main challenges were:
 
-Handling dirty System B record references
-Preserving malformed or blank source values
-Handling duplicate System B entries
-Parsing differently formatted numeric values
-Handling records that do not exist in the other system
-Enforcing organization boundaries during reconciliation
-Separating comparison logic from API logic
+* Handling dirty System B record references
+* Preserving malformed or blank source values
+* Handling duplicate System B entries
+* Parsing differently formatted numeric values
+* Handling records that do not exist in the other system
+* Enforcing organization boundaries during reconciliation
+* Separating comparison logic from API logic
 
-The cross-organization REC-1077 case was particularly important because it showed that matching globally by record reference could produce an incorrect tenant match.
+The cross-organization `REC-1077` case was particularly important because it showed that matching globally by record reference could produce an incorrect tenant match.
 
-📌 Design Decisions
+---
+
+# 📌 Design Decisions
 
 The main architectural decisions are documented in:
 
+```text
 DECISIONS.md
+```
 
 The file contains 10 short decisions covering:
 
-Technology selection
-Database choice
-Source table design
-Dirty-data handling
-Reference normalization
-Duplicate handling
-Value comparison
-Organization boundaries
-Comparison logic separation
-Scope management
+* Technology selection
+* Database choice
+* Source table design
+* Dirty-data handling
+* Reference normalization
+* Duplicate handling
+* Value comparison
+* Organization boundaries
+* Comparison logic separation
+* Scope management
 
 Each entry contains the decision, the alternative that was rejected, and the reasoning that separated the two approaches.
 
-🤖 How I Verified the Agent's Work
+---
+
+# 🤖 How I Verified the Agent's Work
 
 The AI-generated suggestions were verified by:
 
-Running the Django test suite
-Inspecting imported row counts
-Inspecting the actual CSV data
-Checking dirty reference cases
-Checking duplicate cases
-Checking value mismatches
-Checking cross-organization records
-Testing the API filters
-Testing the frontend against the backend API
+* Running the Django test suite
+* Inspecting imported row counts
+* Inspecting the actual CSV data
+* Checking dirty reference cases
+* Checking duplicate cases
+* Checking value mismatches
+* Checking cross-organization records
+* Testing the API filters
+* Testing the frontend against the backend API
 
 The final implementation was not accepted based solely on AI output.
 
-👩‍💻 Author
+---
 
-Rachana Hegde
+# 👩‍💻 Author
+
+**Rachana Hegde**
 
 B.Tech Graduate | Full-Stack / Backend / Data & AI Enthusiast
 
 GitHub:
 
+```text
 https://github.com/Rachana-Hegde
-📝 Required Assignment Questions
-a. Name one thing the AI agent got wrong. How did you notice?
+```
+
+---
+
+# 📝 Required Assignment Questions
+
+## a. Name one thing the AI agent got wrong. How did you notice?
 
 The initial comparison logic matched records using only the normalized record reference. This did not properly enforce the organization boundary.
 
-I noticed this while inspecting the location-to-organization mapping. REC-1077 existed in System A under ORG-A, while System B contained the same reference under ORG-B. I changed the matching key to organization plus normalized record reference and added a test to prevent cross-tenant matching.
+I noticed this while inspecting the location-to-organization mapping. `REC-1077` existed in System A under `ORG-A`, while System B contained the same reference under `ORG-B`. I changed the matching key to organization plus normalized record reference and added a test to prevent cross-tenant matching.
 
-b. Which part of your submission are you least confident about, and why?
+---
+
+## b. Which part of your submission are you least confident about, and why?
 
 I am least confident about production-level tenant isolation because authentication and user context were explicitly outside the scope of this assignment.
 
 The current implementation enforces the organization boundary during reconciliation using the organization associated with each location. In a production system, I would additionally enforce organization-level filtering at the API/query layer using the authenticated tenant.
 
-c. If you had a second day, what would you fix first?
+---
+
+## c. If you had a second day, what would you fix first?
 
 I would first strengthen the tenant boundary at the API layer by introducing an explicit tenant context and organization-level query filtering.
 
 I would also add more edge-case tests for malformed references, missing locations, invalid numeric values, and additional cross-organization scenarios.
+
+````
