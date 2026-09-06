@@ -63,10 +63,8 @@ def organization_id(record):
 
 def record_key(record):
     """
-    Creates a tenant-safe comparison key.
-
-    A record is identified by both its organization and
-    normalized record reference.
+    Creates a tenant-safe comparison key using the organization
+    and normalized record reference.
     """
     return (
         organization_id(record),
